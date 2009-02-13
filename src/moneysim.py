@@ -1,5 +1,10 @@
 Consumer
 
+fffff
+
+ff
+
+
 consumer state:
 
 con_d[cid] += d_c2b[cid][:]
