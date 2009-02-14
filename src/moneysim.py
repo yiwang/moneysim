@@ -1,11 +1,6 @@
 Consumer
 
-I want to have a change
-no ffffff
-
-ssss
-Yi change
-
+consumer state:
 
 con_d[cid] += d_c2b[cid][:]
 
@@ -13,13 +8,13 @@ con_l[cid] += l_b2c[:][cid]
 
 con_c[cid] += l_b2c[:][cid] - d_c2b[cid][:]
 
-con_credit[cid] = (con_c[cid] + con_d[cid] - con_l[cid])
+con_credit[cid] = (con_c[cid] + con_d[cid] - con_l[cid]) 
 
 con_fail[cid] = con_credit[cid] < 0
 
 Fed
 
-fed_r =
+fed_r = 
 
 
 
@@ -35,12 +30,12 @@ bank_l[bid] += l_b2c[bid][:] + l_b2b[bid][:]
 
 
 
-bank_c[bid] = bank_d[bid] - bank_l[bid]
+bank_c[bid] = bank_d[bid] - bank_l[bid] 
 
 bank_c[bid] += fed_l[bid] + l_b2b[:][bid]  ?
 
 
-# consumer
+# consumer 
  
 
 
