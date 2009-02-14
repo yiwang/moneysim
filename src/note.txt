@@ -1,0 +1,4 @@
+# note file Sat, 14 Feb 2009 08:56:33 +0000
+11 	Bank 1 fail -0.72 	bail out 29.28
+86 	Bank 1 fail -11.25 	bail out 18.75
+88 	Bank 1 fail -2.7 	bail out 27.3
