@@ -57,7 +57,9 @@ for step in range(Ntime):
                 Consumer_D[i][i] =  0.5 * Consumer_C[i]
                 Consumer_C[i] = Consumer_C[i] - Consumer_D[i][i]
             if (Consumer_C[i]>0) and (loan_state == 1):
-                Consumer_L[i][i] =  0.25 * Bank_C[i]
+                # if change 0.25 to 0.4 or 0.5, some banks maybe fail
+                #0.25 no fail condition
+                Consumer_L[i][i] =  0.4 * Bank_C[i]
                 Consumer_C[i] = Consumer_C[i] + Consumer_L[i][i]
     #        print step,i,str(Consumer_C[i]),str(Consumer_L[i][i]),str(Consumer_D[i][i]),'BEFORE'
     #        if Consumer_C[i]<0:
@@ -101,14 +103,22 @@ for step in range(Ntime):
         if(0 < Bank_C[b]<=20):
             Fed_L[b]=Fed_L[b]+10
             Bank_C[b] = Bank_C[b]+ 10
-        while(Bank_C[b]<0):
+        # fail condition: if Bank_C<0 or Bank_C < Consumer_D + Bank_Loan (from other bank)
+        if (Bank_C[b]<0) or (b!=4 and Bank_C[b]<Consumer_D[b][b]+Bank_L[b][b+1]):
+        # In part B and C, we can judge whether Bank_C[b] is failed or not every 10 times   
             """ bank failure """
             print step,'\tBank',b,'fail',round(Bank_C[b],2),
             # Fed bail out bank            
             Bank_C[b] = Bank_C[b]+ 30
             Fed_L[b] = Fed_L[b]+ 30
             print '\tbail out', round(Bank_C[b],2)
-        
+        if Bank_C[4]<0 or (Bank_C[4]<Consumer_D[4][4]+Bank_L[4][0]):
+            print step,'\tBank',4,'fail',round(Bank_C[4],2),
+            # Fed bail out bank            
+            Bank_C[4] = Bank_C[4]+ 30
+            Fed_L[4] = Fed_L[4]+ 30
+            print '\tbail out', round(Bank_C[4],2)
+            
         
     #===============================================================================
     # find new M B
@@ -117,18 +127,28 @@ for step in range(Ntime):
     Total_Consumer_Currency = sum(Consumer_C)
 #    sum all banks reserves
     Fed_R.append(sum(Bank_R))
-    
-    M.append(Total_Bank_Currency + Total_Consumer_Currency)
+    # M= Total_Consumer_C + Total_Bank_C + Fed_R
+    M.append(Total_Bank_Currency + Total_Consumer_Currency+Fed_R[-1])
     B.append(Total_Consumer_Currency+Fed_R[-1])
     #===============================================================================
     # Fed adjust rr based on new M/B
     #===============================================================================
     
-# step is old    
-#    if M[step]/B[step]> M[-1]/B[-1]:
+# var step is old step
+    if M[step]/B[step]< M[-1]/B[-1]:
+        #everytime increase will between 0 and i_max
+        i_max=(1-rr[step])/5
+        increase = random.uniform(0,i_max)
+        rr.append(rr[step]+increase)
+    elif M[step]/B[step] > M[-1]/B[-1]:
+        #everytime decrease will between 0 and c
+        d_min=rr[step]/5
+        decrease = random.uniform(0,d_min)
+        rr.append(rr[step]-decrease)
         
-    rr.append(0)
-    rr[-1] = rr[step]
+    else:
+        rr.append(rr[step])
+     #   rr[-1] = rr[step]
     
     #===============================================================================
     # Feb regulate banks through reserve
@@ -136,7 +156,7 @@ for step in range(Ntime):
     #===============================================================================
     for b in range(Nb):
 #        brr = Bank_R[b]/(Bank_R[b]+Bank_C[b])
-        tempR = rr[step]*(Bank_R[b]+Bank_C[b])
+        tempR = rr[step+1]*(Bank_R[b]+Bank_C[b])
         Bank_C[b] = Bank_C[b] + Bank_R[b] - tempR
         Bank_R[b] = tempR
         
