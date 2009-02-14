@@ -2,6 +2,7 @@ import sys
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import pylab
 
 Nb=5 # number of banks
 Nc=5 # number of comsumers
@@ -16,7 +17,7 @@ Consumer_L = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 Fed_L =[0,0,0,0,0]
 
 #===============================================================================
-# Initial value of concerned variables
+# Initial value of concerned variables, for Chart Later
 #===============================================================================
 Fed_R = [0]# total money from bank reserves
 M=[550]
@@ -35,7 +36,7 @@ for i in range(Nb):
     Fed_R[0] = Fed_R[0] + Bank_R[i]
 
 # Number of simulation cycles
-Ntime = 101  
+Ntime = 100 
 for step in range(Ntime):
     #===============================================================================
     # Consumer & Bank # Nc
@@ -142,7 +143,7 @@ print 'step'.ljust(4),\
 'rr'.rjust(WIDTH)
 
 for i in range(Ntime):
-    print str(i).ljust(4),\
+    print str(i+1).ljust(4),\
     str(round(M[i],2)).rjust(WIDTH),\
     str(round(B[i],2)).rjust(WIDTH),\
     str(round(Fed_R[i],2)).rjust(WIDTH),\
@@ -154,27 +155,21 @@ for i in range(Ntime):
 #===============================================================================
 
 fig = plt.figure()
-ax = fig.add_subplot(231)
-ax.plot(M, 'o-')
-ax.set_title('M')
+ax = fig.add_subplot(3,1,1)
+ax.plot(M, 'r-',B,'b-',Fed_R,'g-')
+#ax.set_title('M')
 
-ax = fig.add_subplot(232)
-ax.plot(B, 'o-')
-ax.set_title('B')
+ax.plot(M, 'r-',B,'b-',Fed_R,'g-')
+ax.legend(('M', 'B', 'Fed_R'), shadow = True,loc='upper left')
 
-ax = fig.add_subplot(233)
-ax.plot(Fed_R, 'o-')
-ax.set_title('Fed_R')
 
-ax = fig.add_subplot(234)
-ax.plot(MB, 'o-')
-ax.set_title('M/B')
+ax = fig.add_subplot(3,1,2)
+ax.plot(MB, '-')
+ax.legend(('v=M/B',), shadow = True,loc='upper left')
 
-ax = fig.add_subplot(235)
-ax.plot(rr, 'o-')
-ax.set_title('rr')
+ax = fig.add_subplot(3,1,3)
+ax.plot(rr, '-')
+ax.legend((r'rr',), shadow = True,loc='upper left')
 
 plt.show();
-
-
 
