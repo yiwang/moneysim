@@ -1,12 +1,11 @@
-#! C:\Python25\python.exe
-# -*- coding: utf-8 -*-
-
+import sys
 import random
+import numpy as np
+import matplotlib.pyplot as plt
 
-Nb=5
-Nc=5
+Nb=5 # number of banks
+Nc=5 # number of comsumers
 
-#C=[50]
 #===============================================================================
 # Consumer init
 #===============================================================================
@@ -16,8 +15,10 @@ Consumer_L = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 
 Fed_L =[0,0,0,0,0]
 
-# Time Variation 
-Fed_R = [0]
+#===============================================================================
+# Initial value of concerned variables
+#===============================================================================
+Fed_R = [0]# total money from bank reserves
 M=[550]
 B=[100]
 rr=[0.1]
@@ -33,8 +34,8 @@ for i in range(Nb):
     Bank_C[i] = Bank_C[i] - Bank_R[i]
     Fed_R[0] = Fed_R[0] + Bank_R[i]
 
-# simulation time
-Ntime = 10    
+# Number of simulation cycles
+Ntime = 101  
 for step in range(Ntime):
     #===============================================================================
     # Consumer & Bank # Nc
@@ -88,7 +89,7 @@ for step in range(Ntime):
         Fed_R[-1] = Fed_R[-1] + Bank_R[i]
         
     #===============================================================================
-    # find M B
+    # find new M B
     #===============================================================================
     Total_Bank_Currency = 0
     for b in range(Nb):
@@ -97,14 +98,16 @@ for step in range(Ntime):
     Total_Consumer_Currency = 0
     for c in range(Nc):
         Total_Consumer_Currency = Total_Consumer_Currency + Consumer_C[c]
-    
+
     M.append(Total_Bank_Currency + Total_Consumer_Currency)
     B.append(Total_Consumer_Currency+Fed_R[-1])
     #===============================================================================
-    # Fed adjust rr based on M/B
+    # Fed adjust rr based on new M/B
     #===============================================================================
     
-    M[-1]/B[-1]
+# step is old    
+#    if M[step]/B[step]> M[-1]/B[-1]:
+        
     rr.append(0)
     rr[-1] = rr[step]
     
@@ -118,19 +121,60 @@ for step in range(Ntime):
         Bank_C[b] = Bank_C[b] + Bank_R[b] - tempR
         Bank_R[b] = tempR
         
+#end of one cycle        
+        
+
+# MB = M/B
+MB = [x/y for x,y in zip(M, B)]
+
 #===============================================================================
-# Final
+# Output table
+#===============================================================================
+sys.stdout = open('out.txt','w')
+WIDTH = 14
+
+# Header
+print 'step'.ljust(4),\
+'M'.rjust(WIDTH),\
+'B'.rjust(WIDTH),\
+'Fed_R'.rjust(WIDTH),\
+'M/B'.rjust(WIDTH),\
+'rr'.rjust(WIDTH)
+
+for i in range(Ntime):
+    print str(i).ljust(4),\
+    str(round(M[i],2)).rjust(WIDTH),\
+    str(round(B[i],2)).rjust(WIDTH),\
+    str(round(Fed_R[i],2)).rjust(WIDTH),\
+    str(round(MB[i],2)).rjust(WIDTH),\
+    (str(round(rr[i]*100,2))+'%').rjust(WIDTH)
+
+#===============================================================================
+# Chart
 #===============================================================================
 
-print Fed_R
-print B
-print M
-print rr
-#M[1]
-while(c<2):
-    print "The Money Supply is %0.2f" %(float(M[c]))
-    c=c+1
-c=0
-print "It ends"
+fig = plt.figure()
+ax = fig.add_subplot(231)
+ax.plot(M, 'o-')
+ax.set_title('M')
+
+ax = fig.add_subplot(232)
+ax.plot(B, 'o-')
+ax.set_title('B')
+
+ax = fig.add_subplot(233)
+ax.plot(Fed_R, 'o-')
+ax.set_title('Fed_R')
+
+ax = fig.add_subplot(234)
+ax.plot(MB, 'o-')
+ax.set_title('M/B')
+
+ax = fig.add_subplot(235)
+ax.plot(rr, 'o-')
+ax.set_title('rr')
+
+plt.show();
+
 
 
