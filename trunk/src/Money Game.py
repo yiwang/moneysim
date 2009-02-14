@@ -13,28 +13,55 @@ Nb=5 # number of banks
 Nc=5 # number of comsumers
 
 #===============================================================================
+# Initial value of concerned variables, for Chart Later
+#===============================================================================
+
+Fed_R = [0]# total money from bank reserves
+#M=[550.]
+M=[]
+B=[100.]
+#rr=[0.1]
+#cr=0.1
+
+rr= []
+
+#give cr and rr a random init
+cr = random.uniform(0.1,0.2)
+rr_init = random.uniform(0.1,0.2)
+rr.append(rr_init)
+M_init = (cr+1) * B[0] /(cr+rr[0])
+
+M.append(M_init)
+
+#get D which is Total_B_C + R
+D_init = M[0]/(cr+1)
+
+Total_Consumer_init = M[0]-D_init
+
+
+
+#===============================================================================
 # Consumer init
 #===============================================================================
-Consumer_C = [10,10,10,10,10]
 Consumer_D = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 Consumer_L = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
+#Consumer_C = [10,10,10,10,10]
+Consumer_C =[0,0,0,0,0]
+
+for i in range(Nc):
+    Consumer_C[i] = Total_Consumer_init / 5
 
 GDP = 0.05
 
 Fed_L =[0,0,0,0,0]
 
-#===============================================================================
-# Initial value of concerned variables, for Chart Later
-#===============================================================================
-Fed_R = [0]# total money from bank reserves
-M=[550.]
-B=[100.]
-rr=[0.1]
-cr=0.1
-#===============================================================================
 # Bank init
 #===============================================================================
-Bank_C = [100,100,100,100,100]
+#Bank_C = [100,100,100,100,100]
+Bank_C = [0,0,0,0,0]
+for i in range(Nb):
+    Bank_C[i]= D_init / 5
+
 Bank_L = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 Bank_R = np.zeros((Nb,1))
 for i in range(Nb):
@@ -57,9 +84,9 @@ for step in range(Ntime):
                 Consumer_D[i][i] =  0.5 * Consumer_C[i]
                 Consumer_C[i] = Consumer_C[i] - Consumer_D[i][i]
             if (Consumer_C[i]>0) and (loan_state == 1):
-                # if change 0.25 to 0.4 or 0.5, some banks maybe fail
+                # if change 0.25 to 0.5, some banks maybe fail
                 #0.25 no fail condition
-                Consumer_L[i][i] =  0.4 * Bank_C[i]
+                Consumer_L[i][i] =  0.5 * Bank_C[i]
                 Consumer_C[i] = Consumer_C[i] + Consumer_L[i][i]
     #        print step,i,str(Consumer_C[i]),str(Consumer_L[i][i]),str(Consumer_D[i][i]),'BEFORE'
     #        if Consumer_C[i]<0:
