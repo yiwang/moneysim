@@ -36,7 +36,7 @@ M.append(M_init)
 #get D which is Total_B_C + R
 D_init = M[0]/(cr+1)
 
-Total_Consumer_init = M[0]-D_init
+Total_Consumer_C_init = M[0]-D_init
 
 
 
@@ -49,7 +49,7 @@ Consumer_L = [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
 Consumer_C =[0,0,0,0,0]
 
 for i in range(Nc):
-    Consumer_C[i] = Total_Consumer_init / 5
+    Consumer_C[i] = Total_Consumer_C_init / 5
 
 GDP = 0.05
 
