@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import pylab
 
 # note.txt records bank failure info etc.
-sys.stdout = open('note.txt','w')
-print '# note file', strftime("%a, %d %b %Y %H:%M:%S +0000", localtime())
+#sys.stdout = open('note.txt','w')
+print '# simulation start at', strftime("%a, %d %b %Y %H:%M:%S +0000", localtime())
 
+random.seed(100)
 Nb=5 # number of banks
 Nc=5 # number of comsumers
 
@@ -83,7 +84,7 @@ Fed_L_Sample = []
 Ntime = 100 
 for step in range(Ntime):
     # Make more activities among banks and consumer
-    for j in range(int(5*np.random.rand())):
+    for j in range(int(5*random.random())):
         #===============================================================================
         # Consumer & Bank # Nc
         #===============================================================================
@@ -135,7 +136,8 @@ for step in range(Ntime):
     #===============================================================================
     # calculate Fed_L to Bank
     # if Bank_C<20; Fed loan 10 to Bank
-    
+
+    Fed_L =[0,0,0,0,0]    
     for b in range(Nb):
         if(0 < Bank_C[b]<=20):
             Fed_L[b]=Fed_L[b]+9
@@ -146,7 +148,7 @@ for step in range(Ntime):
             # Fed bail out bank            
             Bank_C[b] = Bank_C[b]+ 29
             Fed_L[b] = Fed_L[b]+ 29
-            print '\tbail out', round(Bank_C[b],2)
+            print '\tafter bail out', round(Bank_C[b],2)
 
 #        # fail condition: if Bank_C<0 or Bank_C < Consumer_D + Bank_Loan (from other bank)
 #        if (Bank_C[b]<0) or (b!=4 and Bank_C[b]<Consumer_D[b][b]+Bank_L[b][b+1]):
@@ -231,7 +233,7 @@ MB = [x/y for x,y in zip(M, B)]
 #===============================================================================
 # Output table to file out.txt
 #===============================================================================
-sys.stdout = open('table.txt','w')
+sys.stdout = open('p1_table.txt','w')
 WIDTH = 14
 
 # Header
@@ -277,7 +279,7 @@ ax.plot(Bank_C_Sample, 'r-')
 ax.legend(('Bank_C_Sample',), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(424)
-ax.plot(Bank_R_Sample,'b-',Fed_L_Sample,'g-')
+ax.plot(Bank_R_Sample,'g-',Fed_L_Sample,'r-')
 ax.legend(('Bank_R_Sample','Fed_L_Sample'), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(426)
@@ -285,9 +287,8 @@ ax.plot(Consumer_C_Sample,'y-')
 ax.legend(('Consumer_C_Sample',), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(428)
-ax.plot(cr, 'r-')
+ax.plot(cr, 'k-')
 ax.legend(('cr',), shadow = True,loc='upper center')
 
 plt.show();
-#plt.savefig('image.png');
-
+#plt.savefig('p1.png');
