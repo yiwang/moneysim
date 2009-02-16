@@ -1,3 +1,11 @@
+#===============================================================================
+# Part A for Assignment 1, Financial Technology
+# Yi Wang    
+#    yw2298@columbia.edu 
+# Yuan Wang
+#    yw2326@columbia.edu
+#===============================================================================
+
 from time import localtime, strftime
 import sys
 import random
@@ -51,7 +59,6 @@ Consumer_C =[0,0,0,0,0]
 for i in range(Nc):
     Consumer_C[i] = Total_Consumer_C_init / 5
 
-GDP = 0.05
 
 # Bank init
 #===============================================================================
@@ -208,12 +215,7 @@ for step in range(Ntime):
         tempR = rr[step+1]*(Bank_R[b]+Bank_C[b])
         Bank_C[b] = Bank_C[b] + Bank_R[b] - tempR
         Bank_R[b] = tempR
-            
-    #===============================================================================
-    # Bank and Comsumer Assert Change GDP
-    #===============================================================================
-    
-    
+                
     #===============================================================================
     # Bank & Consumer Sample  
     #===============================================================================
@@ -256,7 +258,7 @@ for i in range(Ntime):
 # Chart
 #===============================================================================
 
-fig = plt.figure()
+fig = plt.figure(1)
 ax = fig.add_subplot(421)
 ax.plot(M, 'r-',B,'b-')
 ax.legend(('M', 'B'), shadow = True,loc='upper center')

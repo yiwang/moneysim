@@ -1,3 +1,12 @@
+#===============================================================================
+# Part A for Assignment 1, Financial Technology
+# Yi Wang    
+#    yw2298@columbia.edu 
+# Yuan Wang
+#    yw2326@columbia.edu
+#
+#===============================================================================
+
 from time import localtime, strftime
 import sys
 import random
@@ -51,7 +60,8 @@ Consumer_C =[0,0,0,0,0]
 for i in range(Nc):
     Consumer_C[i] = Total_Consumer_C_init / 5
 
-GDP = 0.1
+GDP_max = 0.1
+GDP_min = -0.03
 
 # Bank init
 #===============================================================================
@@ -176,13 +186,17 @@ for step in range(Ntime):
     #===============================================================================
     for i in range(Nb):
         diff = (Bank_C[i]-Bank_C_prev[i])/Bank_C_prev[i]
-        if diff > GDP or diff< -GDP:
-            Bank_C[i] = Bank_C_prev[i]*(1+np.sign(diff)*GDP)
+        if diff > GDP_max:
+            Bank_C[i] = Bank_C_prev[i]*(1+GDP_max)
+        if diff < GDP_min:
+            Bank_C[i] = Bank_C_prev[i]*(1+GDP_min)
             
     for i in range(Nc):
         diff = (Consumer_C[i]-Consumer_C_prev[i])/Consumer_C_prev[i]
-        if diff > GDP or diff< -GDP:
-            Consumer_C[i] = Consumer_C_prev[i]*(1+np.sign(diff)*GDP)
+        if diff > GDP_max:
+            Consumer_C[i] = Consumer_C_prev[i]*(1+GDP_max)
+        if diff < GDP_min:
+            Consumer_C[i] = Consumer_C_prev[i]*(1+GDP_min)
 
     #===============================================================================
     # find new M B
@@ -273,7 +287,7 @@ for i in range(Ntime):
 # Chart
 #===============================================================================
 
-fig = plt.figure()
+fig = plt.figure(2)
 ax = fig.add_subplot(421)
 ax.plot(M, 'r-',B,'b-')
 ax.legend(('M', 'B'), shadow = True,loc='upper center')
