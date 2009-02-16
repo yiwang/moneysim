@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 import pylab
 
 # note.txt records bank failure info etc.
-sys.stdout = open('note.txt','w')
-print '# note file', strftime("%a, %d %b %Y %H:%M:%S +0000", localtime())
+#sys.stdout = open('note.txt','w')
+print '# simulation start at', strftime("%a, %d %b %Y %H:%M:%S +0000", localtime())
 
+random.seed(100)
 Nb=5 # number of banks
 Nc=5 # number of comsumers
 
@@ -50,7 +51,7 @@ Consumer_C =[0,0,0,0,0]
 for i in range(Nc):
     Consumer_C[i] = Total_Consumer_C_init / 5
 
-GDP = 0.05
+GDP = 0.1
 
 # Bank init
 #===============================================================================
@@ -82,8 +83,11 @@ Fed_L_Sample = []
 #===============================================================================
 Ntime = 100 
 for step in range(Ntime):
+    Bank_C_prev = Bank_C[:]
+    Consumer_C_prev = Consumer_C[:]
     # Make more activities among banks and consumer
-    for j in range(int(5*np.random.rand())):
+    # inner cycle
+    for j in range(int(5*random.random())):
         #===============================================================================
         # Consumer & Bank # Nc
         #===============================================================================
@@ -91,12 +95,12 @@ for step in range(Ntime):
             deposit_state = random.randrange(0,2)
             loan_state = random.randrange(0,2)
             if (Consumer_C[i]>0) and (deposit_state == 1):
-                Consumer_D[i][i] =  0.5 * Consumer_C[i]
+                Consumer_D[i][i] =  random.random() * Consumer_C[i]
                 Consumer_C[i] = Consumer_C[i] - Consumer_D[i][i]
             if (Consumer_C[i]>0) and (loan_state == 1):
                 # if change 0.25 to 0.5, some banks maybe fail
                 #0.25 no fail condition
-                Consumer_L[i][i] =  0.5 * Bank_C[i]
+                Consumer_L[i][i] =  0.1*random.random() * Bank_C[i]
                 Consumer_C[i] = Consumer_C[i] + Consumer_L[i][i]
     #        print step,i,str(Consumer_C[i]),str(Consumer_L[i][i]),str(Consumer_D[i][i]),'BEFORE'
     #        if Consumer_C[i]<0:
@@ -110,10 +114,10 @@ for step in range(Ntime):
         for b in range(Nb):
             bank_loan_state = random.randrange(0,2)
             if (b != 4) and (Bank_C[b+1]>0) and (bank_loan_state == 1):
-                Bank_L[b][b+1] = 0.1 * Bank_C[b+1]
+                Bank_L[b][b+1] = random.random() * Bank_C[b+1]
     #            print step,b,'bank loan',Bank_L[b][b+1]
             elif(Bank_C[0]>0) and (bank_loan_state == 1) and (b == 4):
-                Bank_L[4][0] = 0.1 * Bank_C[0]
+                Bank_L[4][0] = random.random() * Bank_C[0]
             
         #    if (b==0) and (Bank_C[1]>0) and (bank_loan_state == 1):
         #        Bank_L[0][1] = 0.1 * Bank_C[1] + Bank_L[0][1]
@@ -131,22 +135,24 @@ for step in range(Ntime):
                 
             
     #===============================================================================
-    # Fed loan to Bank
+    # Fed loan to Bank to bail out
     #===============================================================================
     # calculate Fed_L to Bank
     # if Bank_C<20; Fed loan 10 to Bank
     
+    Fed_L =[0,0,0,0,0]
     for b in range(Nb):
         if(0 < Bank_C[b]<=20):
             Fed_L[b]=Fed_L[b]+9
             Bank_C[b] = Bank_C[b]+ 9
         while(Bank_C[b]<0):
             """ bank failure """
+            # always bail out
             print step,'\tBank',b,'fail',round(Bank_C[b],2),
-            # Fed bail out bank            
+            # Fed bail out bank        
             Bank_C[b] = Bank_C[b]+ 29
             Fed_L[b] = Fed_L[b]+ 29
-            print '\tbail out', round(Bank_C[b],2)
+            print '\tafter bail out', round(Bank_C[b],2)
 
 #        # fail condition: if Bank_C<0 or Bank_C < Consumer_D + Bank_Loan (from other bank)
 #        if (Bank_C[b]<0) or (b!=4 and Bank_C[b]<Consumer_D[b][b]+Bank_L[b][b+1]):
@@ -163,8 +169,21 @@ for step in range(Ntime):
 #            Bank_C[4] = Bank_C[4]+ 30
 #            Fed_L[4] = Fed_L[4]+ 30
 #            print '\tbail out', round(Bank_C[4],2)
+
+    #===============================================================================
+    # Adjust net assets of comsumers and banks
+    # according to GDP
+    #===============================================================================
+    for i in range(Nb):
+        diff = (Bank_C[i]-Bank_C_prev[i])/Bank_C_prev[i]
+        if diff > GDP or diff< -GDP:
+            Bank_C[i] = Bank_C_prev[i]*(1+np.sign(diff)*GDP)
             
-        
+    for i in range(Nc):
+        diff = (Consumer_C[i]-Consumer_C_prev[i])/Consumer_C_prev[i]
+        if diff > GDP or diff< -GDP:
+            Consumer_C[i] = Consumer_C_prev[i]*(1+np.sign(diff)*GDP)
+
     #===============================================================================
     # find new M B
     #===============================================================================
@@ -231,7 +250,7 @@ MB = [x/y for x,y in zip(M, B)]
 #===============================================================================
 # Output table to file out.txt
 #===============================================================================
-sys.stdout = open('table.txt','w')
+sys.stdout = open('p2_table.txt','w')
 WIDTH = 14
 
 # Header
@@ -277,7 +296,7 @@ ax.plot(Bank_C_Sample, 'r-')
 ax.legend(('Bank_C_Sample',), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(424)
-ax.plot(Bank_R_Sample,'b-',Fed_L_Sample,'g-')
+ax.plot(Bank_R_Sample,'g-',Fed_L_Sample,'r-')
 ax.legend(('Bank_R_Sample','Fed_L_Sample'), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(426)
@@ -285,9 +304,9 @@ ax.plot(Consumer_C_Sample,'y-')
 ax.legend(('Consumer_C_Sample',), shadow = True,loc='upper center')
 
 ax = fig.add_subplot(428)
-ax.plot(cr, 'r-')
+ax.plot(cr, 'k-')
 ax.legend(('cr',), shadow = True,loc='upper center')
 
 plt.show();
-#plt.savefig('image.png');
+#plt.savefig('p2.png');
 
