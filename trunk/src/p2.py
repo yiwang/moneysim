@@ -192,7 +192,7 @@ for step in range(Ntime):
 #    sum all banks reserves
     Fed_R.append(sum(Bank_R))
     # M= Total_Consumer_C + Total_Bank_C + Fed_R
-    M.append(Total_Bank_Currency + Total_Consumer_Currency+Fed_R[-1])
+    M.append(Total_Bank_Currency + Total_Consumer_Currency)
     B.append(Total_Consumer_Currency+Fed_R[-1])
     cr.append(Total_Consumer_Currency/Total_Bank_Currency)
     #===============================================================================
