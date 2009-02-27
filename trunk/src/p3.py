@@ -1,5 +1,5 @@
 #===============================================================================
-# Part B for Assignment 1, Financial Technology
+# Part C for Assignment 1, Financial Technology
 # Yi Wang    
 #    yw2298@columbia.edu 
 # Yuan Wang
@@ -18,9 +18,32 @@ import pylab
 #sys.stdout = open('note.txt','w')
 print '# simulation start at', strftime("%a, %d %b %Y %H:%M:%S +0000", localtime())
 
-random.seed(100)
+random.seed(100) # set the random seed
 Nb=5 # number of banks
 Nc=5 # number of comsumers
+
+#===============================================================================
+# Fed interest rate related function definitions
+#===============================================================================
+Fed_rate = 0.05 # Fed interest rate
+def bid_ask():
+    """
+    in the range of 1-2%
+    """
+    return random.random()*0.01+0.01
+    
+SCALAR = 10;
+def rate_factor_bank():
+    """
+    factor to adjust bank's loan bias due to Fed interest rate
+    """
+    return 1 + Fed_rate * SCALAR
+
+def rate_factor_consumer():
+    """
+    factor to adjust consumer based on interest rate
+    """
+    return 1 + (Fed_rate + bid_ask())*SCALAR
 
 #===============================================================================
 # Initial value of concerned variables, for Chart Later
@@ -105,12 +128,12 @@ for step in range(Ntime):
             deposit_state = random.randrange(0,2)
             loan_state = random.randrange(0,2)
             if (Consumer_C[i]>0) and (deposit_state == 1):
-                Consumer_D[i][i] =  random.random() * Consumer_C[i]
+                Consumer_D[i][i] =  random.random() * Consumer_C[i] * rate_factor_consumer()
                 Consumer_C[i] = Consumer_C[i] - Consumer_D[i][i]
             if (Consumer_C[i]>0) and (loan_state == 1):
                 # if change 0.25 to 0.5, some banks maybe fail
                 #0.25 no fail condition
-                Consumer_L[i][i] =  0.1*random.random() * Bank_C[i]
+                Consumer_L[i][i] =  0.1*random.random() * Bank_C[i]* rate_factor_bank()
                 Consumer_C[i] = Consumer_C[i] + Consumer_L[i][i]
     #        print step,i,str(Consumer_C[i]),str(Consumer_L[i][i]),str(Consumer_D[i][i]),'BEFORE'
     #        if Consumer_C[i]<0:
@@ -124,10 +147,10 @@ for step in range(Ntime):
         for b in range(Nb):
             bank_loan_state = random.randrange(0,2)
             if (b != 4) and (Bank_C[b+1]>0) and (bank_loan_state == 1):
-                Bank_L[b][b+1] = random.random() * Bank_C[b+1]
+                Bank_L[b][b+1] = random.random() * Bank_C[b+1] * rate_factor_bank()
     #            print step,b,'bank loan',Bank_L[b][b+1]
             elif(Bank_C[0]>0) and (bank_loan_state == 1) and (b == 4):
-                Bank_L[4][0] = random.random() * Bank_C[0]
+                Bank_L[4][0] = random.random() * Bank_C[0] * rate_factor_bank()
             
         #    if (b==0) and (Bank_C[1]>0) and (bank_loan_state == 1):
         #        Bank_L[0][1] = 0.1 * Bank_C[1] + Bank_L[0][1]
@@ -153,6 +176,7 @@ for step in range(Ntime):
     Fed_L =[0,0,0,0,0]
     for b in range(Nb):
         if(0 < Bank_C[b]<=20):
+            """ when bank's money goes low """
             Fed_L[b]=Fed_L[b]+9
             Bank_C[b] = Bank_C[b]+ 9
         while(Bank_C[b]<0):
@@ -163,22 +187,6 @@ for step in range(Ntime):
             Bank_C[b] = Bank_C[b]+ 29
             Fed_L[b] = Fed_L[b]+ 29
             print '\tafter bail out', round(Bank_C[b],2)
-
-#        # fail condition: if Bank_C<0 or Bank_C < Consumer_D + Bank_Loan (from other bank)
-#        if (Bank_C[b]<0) or (b!=4 and Bank_C[b]<Consumer_D[b][b]+Bank_L[b][b+1]):
-#        # In part B and C, we can judge whether Bank_C[b] is failed or not every 10 times   
-#            """ bank failure """
-#            print step,'\tBank',b,'fail',round(Bank_C[b],2),
-#            # Fed bail out bank            
-#            Bank_C[b] = Bank_C[b]+ 30
-#            Fed_L[b] = Fed_L[b]+ 30
-#            print '\tbail out', round(Bank_C[b],2)
-#        if Bank_C[4]<0 or (Bank_C[4]<Consumer_D[4][4]+Bank_L[4][0]):
-#            print step,'\tBank',4,'fail',round(Bank_C[4],2),
-#            # Fed bail out bank            
-#            Bank_C[4] = Bank_C[4]+ 30
-#            Fed_L[4] = Fed_L[4]+ 30
-#            print '\tbail out', round(Bank_C[4],2)
 
     #===============================================================================
     # Adjust net assets of comsumers and banks
@@ -264,7 +272,7 @@ MB = [x/y for x,y in zip(M, B)]
 #===============================================================================
 # Output table to file out.txt
 #===============================================================================
-sys.stdout = open('p2_table.txt','w')
+sys.stdout = open('p3_table.txt','w')
 WIDTH = 14
 
 # Header
@@ -287,7 +295,7 @@ for i in range(Ntime):
 # Chart
 #===============================================================================
 
-fig = plt.figure(2)
+fig = plt.figure(3)
 ax = fig.add_subplot(421)
 ax.plot(M, 'r-',B,'b-')
 ax.legend(('M', 'B'), shadow = True,loc='upper center')
