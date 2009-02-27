@@ -189,8 +189,8 @@ for step in range(Ntime):
             print '\tafter bail out', round(Bank_C[b],2)
 
     #===============================================================================
-    # Adjust net assets of comsumers and banks
-    # according to GDP
+    # Adjust net assets of consumers and banks
+    # according to GDP rate
     #===============================================================================
     for i in range(Nb):
         diff = (Bank_C[i]-Bank_C_prev[i])/Bank_C_prev[i]
